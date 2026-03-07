@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
+import AutoscalingPanel from "./components/AutoscalingPanel";
 import HealthPanel from "./components/HealthPanel";
 import ResultLog from "./components/ResultLog";
 import StatCard from "./components/StatCard";
-import { fetchHealth, fetchQueueMetrics, fetchResults } from "./services/api";
+import { fetchHealth, fetchQueueMetrics, fetchResults, fetchWorkerMetrics } from "./services/api";
 import "./index.css";
 
 const POLL_INTERVAL = 4000;
@@ -11,19 +12,22 @@ export default function App() {
     const [queue, setQueue] = useState(null);
     const [health, setHealth] = useState(null);
     const [results, setResults] = useState(null);
+    const [workerMetrics, setWorkerMetrics] = useState(null);
     const [error, setError] = useState(null);
     const [lastUpdated, setLastUpdated] = useState(null);
 
     async function refresh() {
         try {
-            const [q, h, r] = await Promise.all([
+            const [q, h, r, w] = await Promise.all([
                 fetchQueueMetrics(),
                 fetchHealth(),
                 fetchResults(20),
+                fetchWorkerMetrics(),
             ]);
             setQueue(q);
             setHealth(h);
             setResults(r);
+            setWorkerMetrics(w);
             setError(null);
             setLastUpdated(new Date());
         } catch (err) {
@@ -64,6 +68,11 @@ export default function App() {
             <section className="section">
                 <h2>System Health</h2>
                 <HealthPanel health={health} />
+            </section>
+
+            <section className="section">
+                <h2>Worker Autoscaling</h2>
+                <AutoscalingPanel metrics={workerMetrics} />
             </section>
 
             <section className="section">

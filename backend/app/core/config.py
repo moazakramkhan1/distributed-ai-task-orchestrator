@@ -13,6 +13,13 @@ class Settings(BaseSettings):
 
     WORKER_HEARTBEAT_TTL_SECONDS: int = 30
 
+    CELERY_QUEUE_NAME: str = "celery"
+
+    K8S_NAMESPACE: str = "ai-orchestrator"
+    WORKER_DEPLOYMENT_NAME: str = "worker"
+    WORKER_MIN_REPLICAS: int = 1
+    WORKER_MAX_REPLICAS: int = 10
+
     model_config = {"env_file": ".env"}
 
 

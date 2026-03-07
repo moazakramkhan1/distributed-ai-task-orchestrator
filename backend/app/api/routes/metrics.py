@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from typing import List
 
 from fastapi import APIRouter, Depends, Query
@@ -6,7 +7,9 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.models.task import TaskStatus
 from app.schemas.task import TaskResponse
-from app.services.task_service import get_tasks_by_status_counts, get_recent_completed
+from app.services.k8s_service import get_worker_deployment_status
+from app.services.queue_metrics_service import get_queue_depth, infer_scaling_status
+from app.services.task_service import get_recent_completed, get_tasks_by_status_counts
 
 router = APIRouter(prefix="/metrics")
 
@@ -29,3 +32,44 @@ def results_log(
     db: Session = Depends(get_db),
 ):
     return get_recent_completed(db, limit=limit)
+
+
+@router.get("/workers")
+def worker_metrics():
+    dep = get_worker_deployment_status()
+    queue_depth = get_queue_depth()
+    status = infer_scaling_status(
+        queue_depth=queue_depth,
+        desired=dep["desired_replicas"],
+        ready=dep["ready_replicas"],
+    )
+    return {
+        "desired_replicas": dep["desired_replicas"],
+        "available_replicas": dep["available_replicas"],
+        "ready_replicas": dep["ready_replicas"],
+        "min_replicas": dep["min_replicas"],
+        "max_replicas": dep["max_replicas"],
+        "queue_depth": queue_depth,
+        "autoscaling": status,
+        "k8s_available": dep["k8s_available"],
+    }
+
+
+@router.get("/autoscaling/events")
+def autoscaling_events():
+    dep = get_worker_deployment_status()
+    queue_depth = get_queue_depth()
+    status = infer_scaling_status(
+        queue_depth=queue_depth,
+        desired=dep["desired_replicas"],
+        ready=dep["ready_replicas"],
+    )
+    return {
+        "queue_depth": queue_depth,
+        "available_replicas": dep["available_replicas"],
+        "desired_replicas": dep["desired_replicas"],
+        "ready_replicas": dep["ready_replicas"],
+        "status": status,
+        "observed_at": datetime.now(timezone.utc).isoformat(),
+        "k8s_available": dep["k8s_available"],
+    }
