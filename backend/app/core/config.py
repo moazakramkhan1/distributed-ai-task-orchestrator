@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     CELERY_RESULT_BACKEND: str
 
     GROQ_API_KEY: str = ""
-    GROQ_MODEL: str = "llama3-8b-8192"
+    GROQ_MODEL: str = "llama-3.3-70b-versatile"
     SIMULATE_AI_FAILURE: bool = False
 
     WORKER_HEARTBEAT_TTL_SECONDS: int = 30

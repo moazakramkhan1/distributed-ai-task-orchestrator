@@ -75,23 +75,20 @@ def process_task(self, task_id: str):
             t = db2.query(Task).filter(Task.id == UUID(task_id)).first()
             if t:
                 t.retry_count += 1
+                # Check if we've exceeded max retries before attempting retry
+                if t.retry_count > _MAX_RETRIES:
+                    t.status = TaskStatus.FAILED
+                    t.result = f"Task failed after {_MAX_RETRIES} retries. Last error: {exc}"
+                    db2.commit()
+                    db2.close()
+                    return
+                
                 t.status = TaskStatus.PENDING
                 db2.commit()
         finally:
             db2.close()
 
-        try:
-            raise self.retry(exc=exc, countdown=_RETRY_COUNTDOWN)
-        except MaxRetriesExceededError:
-            db3 = SessionLocal()
-            try:
-                t = db3.query(Task).filter(Task.id == UUID(task_id)).first()
-                if t:
-                    t.status = TaskStatus.FAILED
-                    t.result = f"Task failed after {_MAX_RETRIES} retries. Last error: {exc}"
-                    db3.commit()
-            finally:
-                db3.close()
+        raise self.retry(exc=exc, countdown=_RETRY_COUNTDOWN)
 
     finally:
         db.close()

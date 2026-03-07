@@ -2,7 +2,7 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 COPY package.json .
-RUN npm install
+RUN npm install --ignore-scripts && npm rebuild
 COPY . .
 RUN npm run build
 
