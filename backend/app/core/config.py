@@ -9,7 +9,7 @@ class Settings(BaseSettings):
 
     GROQ_API_KEY: str = ""
     GROQ_MODEL: str = "llama-3.3-70b-versatile"
-    SIMULATE_AI_FAILURE: bool = False
+    SIMULATE_AI_FAILURE: bool = True
 
     WORKER_HEARTBEAT_TTL_SECONDS: int = 30
 
