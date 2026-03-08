@@ -13,7 +13,11 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title="Distributed AI Task Orchestrator", lifespan=lifespan)
+app = FastAPI(
+    title="Distributed AI Task Orchestrator",
+    lifespan=lifespan,
+    root_path="/api"
+)
 
 app.add_middleware(
     CORSMiddleware,

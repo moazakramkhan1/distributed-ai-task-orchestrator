@@ -16,9 +16,10 @@ spec:
       serviceAccountName: api-sa
       containers:
         - name: api
-          image: ghcr.io/YOUR_GITHUB_OWNER/YOUR_REPO_NAME-api:latest
+          image: ghcr.io/moazakramkhan1/distributed-ai-task-orchestrator-api:latest
           imagePullPolicy: Always
-          command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+          command:
+            ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
           ports:
             - containerPort: 8000
           envFrom:

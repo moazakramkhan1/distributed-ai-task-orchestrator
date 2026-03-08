@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: worker
-          image: ghcr.io/YOUR_GITHUB_OWNER/YOUR_REPO_NAME-worker:latest
+          image: ghcr.io/moazakramkhan1/distributed-ai-task-orchestrator-worker:latest
           imagePullPolicy: Always
           command:
             - celery

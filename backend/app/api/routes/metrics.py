@@ -50,7 +50,7 @@ def worker_metrics():
         "min_replicas": dep["min_replicas"],
         "max_replicas": dep["max_replicas"],
         "queue_depth": queue_depth,
-        "autoscaling": status,
+        "scaling_status": status,
         "k8s_available": dep["k8s_available"],
     }
 
